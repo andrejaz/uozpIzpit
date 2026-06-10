@@ -1,6 +1,8 @@
 import random
 import yaml
 
+from value import Value
+
 
 class MDS1D:
     def __init__(self, items):
@@ -14,8 +16,16 @@ class MDS1D:
         return list(self.pos.values())
 
     def loss(self, data):
-        # implementirajte
-        pass
+        total_loss = Value(0)
+        for (mesto1, mesto2), real_dist in data.items():
+            pos1 = self(mesto1)
+            pos2 = self(mesto2)
+
+            distance_model = (pos1 - pos2)**2
+            razlika = (distance_model**0.5 - real_dist)**2
+
+            total_loss += razlika
+        return total_loss / len(data)
 
 
 def flatten1d(l):
@@ -38,16 +48,27 @@ class MDS2D:
         return flatten1d(list(self.pos.values()))
 
     def loss(self, data):
-        # implementirajte
-        pass
+        total_loss = Value(0)
+        for (mesto1, mesto2), d_ij in data.items():
+            x1, y1 = self.pos[mesto1]
+            x2, y2 = self.pos[mesto2]
+            # Evklidska razdalja v 2D
+            dist_sq = (x1 + (-1 * x2))**2 + (y1 + (-1 * y2))**2
+            pred_dist = dist_sq**0.5
+            total_loss += (d_ij + (-1 * pred_dist))**2
+        return total_loss / len(data)
+    
 
 
 class MDS2DReg(MDS2D):
     # Dodajte regularizacijo po 2. komponenti
 
     def loss(self, data):
-        # implementirajte
-        pass
+        base_loss = super().loss(data)
+        reg_penalty = Value(0)
+        for _, y in self.pos.values():
+            reg_penalty += y**2
+        return base_loss + (reg_penalty / len(self.pos))
 
 
 def train(model, distances, learning_rate=1, n_epochs=500):
