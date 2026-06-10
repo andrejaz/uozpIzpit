@@ -25,7 +25,7 @@ def silhouette_score(X, labels):
 
 def best_k(X, ks, seed=0):
     """Vrne k iz ks z največjo silhueto (z metodo voditeljev)."""
-    raise NotImplementedError
+    
 
 
 if __name__ == "__main__":
